@@ -8,6 +8,7 @@ import com.sparta.board.entity.Board;
 import com.sparta.board.entity.Comment;
 import com.sparta.board.repository.BoardRepository;
 import com.sparta.board.repository.CommentRepository;
+import com.sparta.board.repository.LikeRepository;
 import com.sparta.board.security.UserDetailsImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +25,7 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
 
     @Transactional(readOnly = true)
     public List<BoardResponse> getBoards() {
@@ -32,20 +33,21 @@ public class BoardService {
         List<BoardResponse> boardResponseList = new ArrayList<>();
 
         for (Board board : boards) {
-            List<Comment> commentList = commentRepository.findAllByBoardId(board.getId());
-            List<CommentResponse> commentResponseList = commentList.stream().map(CommentResponse::new).collect(Collectors.toList());
-            boardResponseList.add(new BoardResponse(board, commentResponseList));
+            List<Comment> commentList = commentRepository.findAllByBoard(board);
+            List<CommentResponse> commentResponseList = new ArrayList<>();
+            for (Comment comment : commentList) {
+                Long commentLikeCount = likeRepository.countCommentLikeByCommentId(comment.getId());
+                commentResponseList.add(CommentResponse.from(comment, commentLikeCount));
+            }
+            boardResponseList.add(BoardResponse.from(board, commentResponseList, likeRepository.countBoardLikeByBoardId(board.getId())));
         }
         return boardResponseList;
     }
 
     public BoardResponse createBoard(BoardRequest boardRequest, UserDetailsImpl userDetails) {
 
-        Board board = boardRepository.save(Board.builder()
-                .boardRequest(boardRequest)
-                .user(userDetails.getUser())
-                .build());
-        return new BoardResponse(board);
+        Board board = boardRepository.save(Board.of(boardRequest, userDetails.getUser()));
+        return BoardResponse.from(board);
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +55,7 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(
                 () -> new IllegalArgumentException("게시글이 없습니다.")
         );
-        return new BoardResponse(board);
+        return BoardResponse.from(board);
     }
 
     public BoardResponse updateBoard(Long id, BoardRequest boardRequest, UserDetailsImpl userDetails) {
@@ -63,7 +65,7 @@ public class BoardService {
         );
 
         board.update(boardRequest);
-        return new BoardResponse(board);
+        return BoardResponse.from(board);
     }
 
 
@@ -72,8 +74,12 @@ public class BoardService {
         Board board = boardRepository.findByIdAndUserId(id, userDetails.getUser().getId()).orElseThrow(
                 () -> new NullPointerException("게시글이 없습니다.")
         );
-
+        List<Comment> commentList = commentRepository.findAllByBoard(board);
+        for (Comment comment : commentList) {
+            likeRepository.deleteByCommentId(comment.getId());
+        }
         commentRepository.deleteAllByBoardId(board.getId());
+        likeRepository.deleteByBoardId(board.getId());
         boardRepository.deleteById(id);
         return new MessageResponse(HttpStatus.OK.value(), "게시글/댓글 삭제 완료");
     }

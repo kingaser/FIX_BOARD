@@ -1,6 +1,7 @@
 package com.sparta.board.entity;
 
 import com.sparta.board.dto.request.BoardRequest;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Board extends Timestamped {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +40,11 @@ public class Board extends Timestamped {
         contents = boardRequest.getContents();
     }
 
-    public void delete() {
-
+    public static Board of(BoardRequest boardRequest, User user) {
+        return Board.builder()
+                .boardRequest(boardRequest)
+                .user(user)
+                .build();
     }
+
 }

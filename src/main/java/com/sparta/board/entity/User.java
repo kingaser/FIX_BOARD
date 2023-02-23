@@ -1,16 +1,16 @@
 package com.sparta.board.entity;
 
-import com.sparta.board.dto.request.SignupRequest;
 import com.sparta.board.entity.enumtype.UserRoleEnum;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Entity(name = "users")
-@NoArgsConstructor
 @Getter
+@Entity(name = "users")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)

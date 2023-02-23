@@ -1,6 +1,8 @@
 package com.sparta.board.entity;
 
 import com.sparta.board.dto.request.CommentRequest;
+import com.sparta.board.dto.response.CommentResponse;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +11,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends Timestamped {
 
     @Id
@@ -27,7 +29,7 @@ public class Comment extends Timestamped {
     private Board board;
 
     @Builder
-    public Comment(CommentRequest commentRequest, Board board, User user) {
+    private Comment(CommentRequest commentRequest, Board board, User user) {
         comments = commentRequest.getComments();
         this.board = board;
         this.user = user;
@@ -35,5 +37,13 @@ public class Comment extends Timestamped {
 
     public void update(CommentRequest commentRequest) {
         comments = commentRequest.getComments();
+    }
+
+    public static Comment of(CommentRequest commentRequest, User user, Board board) {
+        return Comment.builder()
+                .commentRequest(commentRequest)
+                .user(user)
+                .board(board)
+                .build();
     }
 }
