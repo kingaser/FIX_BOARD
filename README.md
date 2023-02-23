@@ -8,8 +8,8 @@ ERD
 ![화면 캡처 2023-02-22 230940](https://user-images.githubusercontent.com/104209781/220652329-deeeec03-1ab1-404a-8ec2-06733ecbd1b3.png)
 
 게시글 명세서
-![게시판 명세서1](https://user-images.githubusercontent.com/104209781/220652349-61cf5b5a-948b-4685-9266-14d70e706275.png)
-![게시판 명세서2](https://user-images.githubusercontent.com/104209781/220652368-acffff3e-b693-4bb5-ade7-ec952ceb395f.png)
+![게시판 명세서1](https://user-images.githubusercontent.com/104209781/220794730-0e2219ce-2a18-4e03-bafa-83fc5a0154ab.png)
+![게시판 명세서2](https://user-images.githubusercontent.com/104209781/220794738-c782dddb-0c64-4f8e-a804-d3f4bd30f231.png)
 
 댓글 명세서
 ![댓글 명세서](https://user-images.githubusercontent.com/104209781/220652384-0d972b30-4e6d-421c-9f16-d356f0f310c3.png)
